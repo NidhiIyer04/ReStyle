@@ -87,17 +87,31 @@ def rgb_to_hsl(r, g, b):
 def determine_temperature(hues):
     warm_hues = sum(1 for h in hues if 0 <= h <= 60 or 300 <= h <= 360)
     cool_hues = len(hues) - warm_hues
-    return "Warm" if warm_hues > cool_hues else "Cool"
+    return "Warm" if warm_hues >= cool_hues else "Cool"
 
 # Function to determine overall depth
 def determine_depth(lightness_values):
     average_lightness = sum(lightness_values) / len(lightness_values)
-    if average_lightness < 33:
+    if average_lightness < 20:
+        return "Very Dark"
+    elif 20 <= average_lightness < 40:
         return "Dark"
-    elif 33 <= average_lightness <= 66:
+    elif 40 <= average_lightness < 60:
+        return "Medium"
+    elif 60 <= average_lightness < 80:
+        return "Light"
+    else:
+        return "Very Light"
+
+# Function to determine overall chroma
+def determine_chroma(saturation_values):
+    average_saturation = sum(saturation_values) / len(saturation_values)
+    if average_saturation < 20:
+        return "Low"
+    elif 20 <= average_saturation < 40:
         return "Medium"
     else:
-        return "Light"
+        return "High"
 
 # Main function
 def main():
@@ -132,16 +146,20 @@ def main():
             # Detect colors in the cropped image, excluding gray colors
             colors = detect_colors(cropped_image, num_colors=20, detect_lip_color=True)
 
-            # Convert colors to HSL and extract hues and lightness values
+            # Convert colors to HSL and extract hues, saturation, and lightness values
             hsl_colors = [rgb_to_hsl(r, g, b) for r, g, b in colors]
             hues = [h for h, s, l in hsl_colors]
             lightness_values = [l for h, s, l in hsl_colors]
+            saturation_values = [s for h, s, l in hsl_colors]
 
             # Determine temperature
             temperature = determine_temperature(hues)
 
             # Determine overall depth
             depth = determine_depth(lightness_values)
+
+            # Determine overall chroma
+            chroma = determine_chroma(saturation_values)
 
             # Display the original image, segmented image, cropped image, and color palette
             st.subheader("Original Image")
@@ -162,6 +180,7 @@ def main():
             
             st.subheader(f"Overall Temperature: {temperature}")
             st.subheader(f"Overall Depth: {depth}")
+            st.subheader(f"Overall Chroma: {chroma}")
 
 if __name__ == '__main__':
     main()
