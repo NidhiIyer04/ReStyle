@@ -4,6 +4,7 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 from sklearn.cluster import KMeans
+import colorsys
 
 # MediaPipe setup
 mp_drawing = mp.solutions.drawing_utils
@@ -74,6 +75,30 @@ def detect_colors(image, num_colors=20, detect_lip_color=False):
 
     return filtered_colors[:20]
 
+# Function to convert RGB to HSL and return hue, saturation, and lightness
+def rgb_to_hsl(r, g, b):
+    h, l, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
+    h = h * 360  # Convert hue to degrees
+    s = s * 100  # Convert saturation to percentage
+    l = l * 100  # Convert lightness to percentage
+    return h, s, l
+
+# Function to determine temperature from hues
+def determine_temperature(hues):
+    warm_hues = sum(1 for h in hues if 0 <= h <= 60 or 300 <= h <= 360)
+    cool_hues = len(hues) - warm_hues
+    return "Warm" if warm_hues > cool_hues else "Cool"
+
+# Function to determine overall depth
+def determine_depth(lightness_values):
+    average_lightness = sum(lightness_values) / len(lightness_values)
+    if average_lightness < 33:
+        return "Dark"
+    elif 33 <= average_lightness <= 66:
+        return "Medium"
+    else:
+        return "Light"
+
 # Main function
 def main():
     # Streamlit UI
@@ -107,6 +132,17 @@ def main():
             # Detect colors in the cropped image, excluding gray colors
             colors = detect_colors(cropped_image, num_colors=20, detect_lip_color=True)
 
+            # Convert colors to HSL and extract hues and lightness values
+            hsl_colors = [rgb_to_hsl(r, g, b) for r, g, b in colors]
+            hues = [h for h, s, l in hsl_colors]
+            lightness_values = [l for h, s, l in hsl_colors]
+
+            # Determine temperature
+            temperature = determine_temperature(hues)
+
+            # Determine overall depth
+            depth = determine_depth(lightness_values)
+
             # Display the original image, segmented image, cropped image, and color palette
             st.subheader("Original Image")
             st.image(image, caption="Original Image", use_column_width=True)
@@ -122,7 +158,10 @@ def main():
             for col, color in zip(palette_col, colors):
                 color_square = np.zeros((100, 100, 3), dtype=np.uint8)
                 color_square[:, :] = color
-                col.image(color_square, caption=f"RGB: {color}", use_column_width=True)
+                col.image(color_square, use_column_width=True)
+            
+            st.subheader(f"Overall Temperature: {temperature}")
+            st.subheader(f"Overall Depth: {depth}")
 
 if __name__ == '__main__':
     main()
