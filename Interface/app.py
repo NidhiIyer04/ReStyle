@@ -10,6 +10,7 @@ import colorsys
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 
+
 # Function to apply selfie segmentation
 def apply_selfie_segmentation(image, model_selection):
     with mp_selfie_segmentation.SelfieSegmentation(model_selection=model_selection) as selfie_segmentation:
@@ -20,6 +21,7 @@ def apply_selfie_segmentation(image, model_selection):
         output_image = np.where(condition, image, bg_image)
         return output_image
 
+
 # Function to detect faces in an image
 def detect_faces(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -27,13 +29,15 @@ def detect_faces(image):
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
     return faces
 
+
 # Function to crop the image to the first detected face
 def crop_to_face(image, faces):
     if len(faces) == 0:
         return None
     (x, y, w, h) = faces[0]
-    cropped_image = image[y:y+h, x:x+w]
+    cropped_image = image[y:y + h, x:x + w]
     return cropped_image
+
 
 # Function to detect dominant colors in an image and optionally lip color
 def detect_colors(image, num_colors=20, detect_lip_color=False):
@@ -75,6 +79,7 @@ def detect_colors(image, num_colors=20, detect_lip_color=False):
 
     return filtered_colors[:20]
 
+
 # Function to convert RGB to HSL and return hue, saturation, and lightness
 def rgb_to_hsl(r, g, b):
     h, l, s = colorsys.rgb_to_hls(r / 255, g / 255, b / 255)
@@ -83,11 +88,13 @@ def rgb_to_hsl(r, g, b):
     l = l * 100  # Convert lightness to percentage
     return h, s, l
 
+
 # Function to determine temperature from hues
 def determine_temperature(hues):
     warm_hues = sum(1 for h in hues if 0 <= h <= 60 or 300 <= h <= 360)
     cool_hues = len(hues) - warm_hues
     return "Warm" if warm_hues >= cool_hues else "Cool"
+
 
 # Function to determine overall depth
 def determine_depth(lightness_values):
@@ -103,6 +110,7 @@ def determine_depth(lightness_values):
     else:
         return "Very Light"
 
+
 # Function to determine overall chroma
 def determine_chroma(saturation_values):
     average_saturation = sum(saturation_values) / len(saturation_values)
@@ -113,6 +121,71 @@ def determine_chroma(saturation_values):
     else:
         return "High"
 
+# Function to map colors to 12-season color theory
+def map_to_season(hues, lightness_values, saturation_values):
+    seasons = {
+        'Bright Spring': 0,
+        'True Spring': 0,
+        'Light Spring': 0,
+        'Light Summer': 0,
+        'True Summer': 0,
+        'Soft Summer': 0,
+        'Soft Autumn': 0,
+        'True Autumn': 0,
+        'Deep Autumn': 0,
+        'Deep Winter': 0,
+        'True Winter': 0,
+        'Bright Winter': 0
+    }
+    for h, l, s in zip(hues, lightness_values, saturation_values):
+        # Determine the season based on hue, lightness, and saturation
+        if 0 <= h < 45 or 330 <= h <= 360:  # Warm hues
+            if s > 50 and l > 50:
+                seasons['Bright Spring'] += 1
+            elif s > 50 and l <= 50:
+                seasons['True Spring'] += 1
+            elif s <= 50 and l > 50:
+                seasons['Light Spring'] += 1
+        elif 45 <= h < 170:  # Cool hues
+            if s <= 50 and l > 50:
+                seasons['Light Summer'] += 1
+            elif s <= 50 and l <= 50:
+                seasons['True Summer'] += 1
+            elif s > 50 and l <= 50:
+                seasons['Soft Summer'] += 1
+        elif 170 <= h < 260:  # Muted hues
+            if s <= 50 and l <= 50:
+                seasons['Soft Autumn'] += 1
+            elif s > 50 and l <= 50:
+                seasons['True Autumn'] += 1
+            elif s > 50 and l > 50:
+                seasons['Deep Autumn'] += 1
+        elif 260 <= h < 330:  # Cool hues
+            if s > 50 and l <= 50:
+                seasons['Deep Winter'] += 1
+            elif s > 50 and l > 50:
+                seasons['True Winter'] += 1
+            elif s <= 50 and l > 50:
+                seasons['Bright Winter'] += 1
+    # Determine the predominant season
+    predominant_season = max(seasons, key=seasons.get)
+    return predominant_season
+
+# Function to recommend colors based on the season
+def recommend_colors(season):
+    color_ranges = {
+        "Deep Winter": [(0, 0, 50), (0, 50, 100), (100, 0, 50)],  # Dark blues, purples, and cool reds
+        "Dark Winter": [(50, 0, 50), (0, 0, 100), (50, 50, 100)],  # Dark purples, blues, and cool grays
+        "Cool Winter": [(0, 0, 100), (0, 50, 150), (150, 150, 200)],  # Cool blues, icy tones
+        "Bright Winter": [(200, 0, 0), (0, 0, 0), (255, 255, 255)],  # Bright reds, blacks, whites
+        "Deep Autumn": [(50, 25, 0), (100, 50, 0), (100, 25, 0)],  # Dark browns, burnt oranges
+        "Warm Autumn": [(150, 75, 0), (200, 100, 0), (100, 25, 0)],  # Warm browns, oranges
+        "Soft Autumn": [(150, 100, 50), (100, 50, 0), (50, 25, 0)],  # Soft browns, beiges
+        "Cool Summer": [(0, 100, 200), (50, 150, 255), (0, 75, 150)],  # Cool blues, aquas
+        "Soft Summer": [(100, 100, 150), (75, 75, 100), (50, 50, 75)],  # Soft grays, lavenders
+        "Light Summer": [(150, 150, 200), (100, 100, 150), (75, 75, 125)],  # Light lavenders, cool grays
+        "Bright Summer": [(255, 0, 150), (255, 50, 200), (255, 100, 255)],  # Bright
+    }
 # Main function
 def main():
     # Streamlit UI
@@ -161,10 +234,13 @@ def main():
             # Determine overall chroma
             chroma = determine_chroma(saturation_values)
 
+            # Determine the season
+            season = map_to_season(hues, lightness_values, saturation_values)
+
             # Display the original image, segmented image, cropped image, and color palette
             st.subheader("Original Image")
             st.image(image, caption="Original Image", use_column_width=True)
-            
+
             st.subheader("Segmented Image with Detected Face")
             st.image(pil_segmented_image, caption="Segmented Image with Detected Face", use_column_width=True)
 
@@ -177,10 +253,15 @@ def main():
                 color_square = np.zeros((100, 100, 3), dtype=np.uint8)
                 color_square[:, :] = color
                 col.image(color_square, use_column_width=True)
-            
+
             st.subheader(f"Overall Temperature: {temperature}")
             st.subheader(f"Overall Depth: {depth}")
             st.subheader(f"Overall Chroma: {chroma}")
+            st.subheader(f"Season: {season}")
+            st.text(f"Congratulations!! You are a {season}. ")
+
+
+
 
 if __name__ == '__main__':
     main()

@@ -3,17 +3,25 @@ import pandas as pd
 import os
 import base64
 
+
 # Function to read CSV with custom parser
 def read_csv_with_custom_parser(csv_path):
     df = pd.read_csv(csv_path)
     return df
 
+
 # Sidebar filters
 st.sidebar.header('Filters')
 
 # Try to read CSV file with custom parser
+csv_path = '/home/niya/mycode/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
+if not os.path.isfile(csv_path):
+    st.error(f"CSV file does not exist at the specified path: {csv_path}")
+    st.stop()
+
+
 try:
-    csv_path = 'data/dataset/myntradataset/styles.csv'
+    csv_path = '/home/niya/mycode/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
     df = read_csv_with_custom_parser(csv_path)
 except Exception as e:
     st.error(f"Error reading CSV file: {e}")
@@ -29,12 +37,14 @@ for col in df.columns:
             default=df[col].dropna().unique()
         )
 
+
 # Apply filters function
 def apply_filters(df, filters):
     filtered_df = df.copy()
     for col, vals in filters.items():
         filtered_df = filtered_df[filtered_df[col].isin(vals)]
     return filtered_df
+
 
 # "Apply Filters" button
 if st.sidebar.button('Apply Filters'):
