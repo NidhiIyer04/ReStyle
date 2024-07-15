@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 import colorsys
 import streamlit as st
 import pandas as pd
+import subprocess
 
 # Define the options
 gender_options = ['Men', 'Women', 'Boys', 'Girls', 'Unisex']
@@ -248,6 +249,20 @@ def recommend_colors(season):
     palette = color_ranges.get(season, [])  # Return color range for the given season, or empty list if not found
     return palette
 
+
+# Function to display the season and recommended colors
+def display_season_and_colors(season, colors):
+    st.write(f"Congratulations!!!! You are a **{season}** season.")
+    st.write("Here are the colors that suit you:")
+
+    # Display colors
+    for color in colors:
+
+        st.markdown(
+            f"<div style='width: 50px; height: 50px; background-color: rgb{color}; display: inline-block; margin: 5px;'></div>",
+            unsafe_allow_html=True)
+
+
 # Main function
 def main():
     # Streamlit UI
@@ -322,9 +337,15 @@ def main():
             st.subheader(f"Overall Depth: {depth}")
             st.subheader(f"Overall Chroma: {chroma}")
             st.subheader(f"Season: {season}")
-            st.text(f"Congratulations!! You are a {season}. ")
-            st.text(f"Your color palette is as follows {palette}.")
+            recommended_colors = recommend_colors(season)
+
+            display_season_and_colors(season, recommended_colors)
             
+            if st.sidebar.button("Start shopping"):
+                if gender == '' or master_category == '' or uploaded_file is None:
+                    st.sidebar.warning("Please complete the required sections: Gender, Master Category, and Image Upload.")
+                else:
+                    subprocess.run(["streamlit", "run", "/home/nidhi/ReStyle/Interface/shopping.py"])
 
 
 
