@@ -14,14 +14,14 @@ def read_csv_with_custom_parser(csv_path):
 st.sidebar.header('Filters')
 
 # Try to read CSV file with custom parser
-csv_path = '/home/niya/mycode/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
+csv_path = '/home/nidhi/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
 if not os.path.isfile(csv_path):
     st.error(f"CSV file does not exist at the specified path: {csv_path}")
     st.stop()
 
 
 try:
-    csv_path = '/home/niya/mycode/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
+    csv_path = '/home/nidhi/ReStyle/Interface/data/dataset/myntradataset/styles.csv'
     df = read_csv_with_custom_parser(csv_path)
 except Exception as e:
     st.error(f"Error reading CSV file: {e}")
@@ -74,7 +74,7 @@ if st.sidebar.button('Apply Filters'):
     """
     st.markdown(html_content, unsafe_allow_html=True)
 
-    images_path = 'data/dataset/myntradataset/images'
+    images_path = '/home/nidhi/ReStyle/Interface/data/dataset/myntradataset/images'
     for index, row in filtered_df.iterrows():
         image_path = os.path.join(images_path, f"{row['id']}.jpg")
         if os.path.exists(image_path):
