@@ -20,9 +20,18 @@ ReStyle is an innovative application that offers personalized shopping experienc
     ```
 
 2. Install the required dependencies:
+   * Create a virtual environment
+     ```bash
+     python -m venv venv
+    
+    * Activate the virtual environment
+      ```bash
+      source venv/bin/activate
+      
+    * Install the dependencies
     ```bash
     pip install -r requirements.txt
-    ```
+    
 
 ## Usage
 
