@@ -9,61 +9,6 @@ import streamlit as st
 import pandas as pd
 import subprocess
 
-# Define the options
-gender_options = ['Men', 'Women', 'Boys', 'Girls', 'Unisex']
-master_category_options = [
-    'Apparel', 'Accessories', 'Footwear', 'Personal Care', 'Free Items',
-    'Sporting Goods', 'Home'
-]
-sub_category_options = [
-    'Topwear', 'Bottomwear', 'Watches', 'Socks', 'Shoes', 'Belts', 'Flip Flops',
-    'Bags', 'Innerwear', 'Sandal', 'Shoe Accessories', 'Fragrance', 'Jewellery',
-    'Lips', 'Saree', 'Eyewear', 'Nails', 'Scarves', 'Dress', 'Loungewear and Nightwear',
-    'Wallets', 'Apparel Set', 'Headwear', 'Mufflers', 'Skin Care', 'Makeup', 'Free Gifts',
-    'Ties', 'Accessories', 'Skin', 'Beauty Accessories', 'Water Bottle', 'Eyes',
-    'Bath and Body', 'Gloves', 'Sports Accessories', 'Cufflinks', 'Sports Equipment',
-    'Stoles', 'Hair', 'Perfumes', 'Home Furnishing', 'Umbrellas', 'Wristbands', 'Vouchers'
-]
-article_type_options = [
-    'Shirts', 'Jeans', 'Watches', 'Track Pants', 'Tshirts', 'Socks', 'Casual Shoes',
-    'Belts', 'Flip Flops', 'Handbags', 'Tops', 'Bra', 'Sandals', 'Shoe Accessories',
-    'Sweatshirts', 'Deodorant', 'Formal Shoes', 'Bracelet', 'Lipstick', 'Flats',
-    'Kurtas', 'Waistcoat', 'Sports Shoes', 'Shorts', 'Briefs', 'Sarees', 'Perfume and Body Mist',
-    'Heels', 'Sunglasses', 'Innerwear Vests', 'Pendant', 'Nail Polish', 'Laptop Bag',
-    'Scarves', 'Rain Jacket', 'Dresses', 'Night suits', 'Skirts', 'Wallets', 'Blazers',
-    'Ring', 'Kurta Sets', 'Clutches', 'Shrug', 'Backpacks', 'Caps', 'Trousers', 'Earrings',
-    'Camisoles', 'Boxers', 'Jewellery Set', 'Dupatta', 'Capris', 'Lip Gloss', 'Bath Robe',
-    'Mufflers', 'Tunics', 'Jackets', 'Trunk', 'Lounge Pants', 'Face Wash and Cleanser',
-    'Necklace and Chains', 'Duffel Bag', 'Sports Sandals', 'Foundation and Primer',
-    'Sweaters', 'Free Gifts', 'Trolley Bag', 'Tracksuits', 'Swimwear', 'Shoe Laces',
-    'Fragrance Gift Set', 'Bangle', 'Nightdress', 'Ties', 'Baby Dolls', 'Leggings',
-    'Highlighter and Blush', 'Travel Accessory', 'Kurtis', 'Mobile Pouch', 'Messenger Bag',
-    'Lip Care', 'Face Moisturisers', 'Compact', 'Eye Cream', 'Accessory Gift Set',
-    'Beauty Accessory', 'Jumpsuit', 'Kajal and Eyeliner', 'Water Bottle', 'Suspenders',
-    'Lip Liner', 'Robe', 'Salwar and Dupatta', 'Patiala', 'Stockings', 'Eyeshadow',
-    'Headband', 'Tights', 'Nail Essentials', 'Churidar', 'Lounge Tshirts',
-    'Face Scrub and Exfoliator', 'Lounge Shorts', 'Gloves', 'Mask and Peel', 'Wristbands',
-    'Tablet Sleeve', 'Ties and Cufflinks', 'Footballs', 'Stoles', 'Shapewear',
-    'Nehru Jackets', 'Salwar', 'Cufflinks', 'Jeggings', 'Hair Colour', 'Concealer',
-    'Rompers', 'Body Lotion', 'Sunscreen', 'Booties', 'Waist Pouch', 'Hair Accessory',
-    'Rucksacks', 'Basketballs', 'Lehenga Choli', 'Clothing Set', 'Mascara', 'Toner',
-    'Cushion Covers', 'Key chain', 'Makeup Remover', 'Lip Plumper', 'Umbrellas',
-    'Face Serum and Gel', 'Hat', 'Mens Grooming Kit', 'Rain Trousers', 'Body Wash and Scrub',
-    'Suits', 'Ipad'
-]
-usage_options = [
-    'Casual', 'Ethnic', 'Formal', 'Sports', 'Smart Casual', 'Travel', 'Party', 'Home'
-]
-
-# Sidebar
-st.sidebar.title('User Filters')
-gender = st.sidebar.selectbox('Gender *', [''] + gender_options)
-master_category = st.sidebar.selectbox('Master Category *', [''] + master_category_options)
-sub_category = st.sidebar.selectbox('Sub Category', [''] + sub_category_options)
-article_type = st.sidebar.selectbox('Article Type', [''] + article_type_options)
-usage = st.sidebar.selectbox('Usage', [''] + usage_options)
-
-
 # MediaPipe setup
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
@@ -231,23 +176,42 @@ def map_to_season(hues, lightness_values, saturation_values):
 
 # Function to recommend colors based on the season
 def recommend_colors(season):
-    color_ranges = {
-        "Bright Spring": [(255, 255, 255), (255, 0, 150), (255, 200, 200)],  # Bright whites, pinks, and light reds
-        "True Spring": [(255, 200, 200), (255, 255, 255), (255, 255, 0)],  # Warm pinks, whites, and yellows
-        "Light Spring": [(255, 255, 0), (255, 200, 200), (255, 150, 100)],  # Warm yellows, pinks, and light oranges
-        "Light Summer": [(150, 150, 200), (100, 100, 150), (75, 75, 125)],  # Light lavenders, cool grays
-        "True Summer": [(100, 100, 150), (75, 75, 100), (50, 50, 75)],  # Soft grays, lavenders
-        "Soft Summer": [(50, 50, 75), (75, 75, 100), (100, 100, 150)],  # Cool grays, soft blues, lavenders
-        "Soft Autumn": [(100, 50, 0), (150, 100, 50), (200, 150, 100)],  # Soft browns, oranges, and beiges
-        "True Autumn": [(200, 150, 100), (150, 100, 50), (100, 50, 0)],  # Warm oranges, browns, and dark yellows
-        "Dark Autumn": [(100, 25, 0), (100, 50, 0), (50, 25, 0)],  # Dark browns, burnt oranges
-        "Dark Winter": [(0, 0, 100), (0, 50, 150), (150, 150, 200)],  # Cool blues, icy tones
-        "True Winter": [(0, 50, 150), (0, 0, 100), (0, 0, 50)],  # Cool blues, purples, and dark grays
-        "Bright Winter": [(255, 255, 255), (200, 0, 0), (150, 0, 0)],  # Bright whites, bright reds, dark reds
+    color_map = {
+        'Bright Spring': 'red-yellow-blue',
+        'True Spring': 'yellow-green-blue',
+        'Light Spring': 'pink-beige-blue',
+        'Light Summer': 'pastel-blue-green',
+        'True Summer': 'blue-green-pink',
+        'Soft Summer': 'grey-blue-green',
+        'Soft Autumn': 'earth-tone',
+        'True Autumn': 'orange-brown-green',
+        'Deep Autumn': 'dark-brown-green',
+        'Deep Winter': 'black-grey-blue',
+        'True Winter': 'black-white-red',
+        'Bright Winter': 'bright-blue-red-white'
     }
-
-    palette = color_ranges.get(season, [])  # Return color range for the given season, or empty list if not found
-    return palette
+    colors = color_map.get(season, 'black')
+    color_query = '+'.join(colors.split('-'))
+    url = f"https://www.myntra.com/{colors}?rawQuery={color_query}"
+    
+    # Define some example color palettes
+    color_ranges = {
+        'Bright Spring': [(255, 0, 0), (255, 255, 0), (0, 0, 255)],
+        'True Spring': [(255, 255, 0), (0, 255, 0), (0, 0, 255)],
+        'Light Spring': [(255, 192, 203), (255, 228, 225), (0, 191, 255)],
+        'Light Summer': [(173, 216, 230), (144, 238, 144), (152, 251, 152)],
+        'True Summer': [(70, 130, 180), (0, 255, 255), (255, 192, 203)],
+        'Soft Summer': [(128, 128, 128), (192, 192, 192), (0, 128, 128)],
+        'Soft Autumn': [(139, 69, 19), (160, 82, 45), (205, 133, 63)],
+        'True Autumn': [(255, 69, 0), (139, 69, 19), (0, 128, 0)],
+        'Deep Autumn': [(101, 67, 33), (139, 69, 19), (0, 100, 0)],
+        'Deep Winter': [(0, 0, 0), (169, 169, 169), (0, 0, 139)],
+        'True Winter': [(0, 0, 0), (255, 255, 255), (255, 0, 0)],
+        'Bright Winter': [(0, 0, 255), (255, 0, 0), (255, 255, 255)]
+    }
+    palette = color_ranges.get(season, [])
+    
+    return [url, palette]
 
 
 # Function to display the season and recommended colors
@@ -314,7 +278,7 @@ def main():
             # Determine the season
             season = map_to_season(hues, lightness_values, saturation_values)
             
-            palette = recommend_colors(season)
+            
 
             # Display the original image, segmented image, cropped image, and color palette
             st.subheader("Original Image")
@@ -337,15 +301,12 @@ def main():
             st.subheader(f"Overall Depth: {depth}")
             st.subheader(f"Overall Chroma: {chroma}")
             st.subheader(f"Season: {season}")
-            recommended_colors = recommend_colors(season)
+            recommended_colors_url, recommended_colors_palette = recommend_colors(season)
 
-            display_season_and_colors(season, recommended_colors)
+            display_season_and_colors(season, recommended_colors_palette )
+
+            st.write(f"Check out the [recommended products on Myntra]({recommended_colors_url})")
             
-            if st.sidebar.button("Start shopping"):
-                if gender == '' or master_category == '' or uploaded_file is None:
-                    st.sidebar.warning("Please complete the required sections: Gender, Master Category, and Image Upload.")
-                else:
-                    subprocess.run(["streamlit", "run", "/home/nidhi/ReStyle/Interface/shopping.py"])
 
 
 
