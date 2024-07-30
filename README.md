@@ -8,7 +8,6 @@ ReStyle is an innovative application that offers personalized shopping experienc
 - **Face Detection**: Detects faces in the uploaded image and crops to the first detected face.
 - **Color Detection**: Identifies dominant colors in the cropped face image and excludes gray colors.
 - **Color Palette Recommendation**: Provides a recommended color palette based on 12-season color theory.
-- **User Filters**: Apply filters such as gender, master category, sub-category, article type, and usage.
 - **Personalized Shopping**: Display clothing items in the Myntra website that match the user's selected filters and recommended color palette.
 
 ## Installation
