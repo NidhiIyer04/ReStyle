@@ -9,7 +9,7 @@ ReStyle is an innovative application that offers personalized shopping experienc
 - **Color Detection**: Identifies dominant colors in the cropped face image and excludes gray colors.
 - **Color Palette Recommendation**: Provides a recommended color palette based on 12-season color theory.
 - **User Filters**: Apply filters such as gender, master category, sub-category, article type, and usage.
-- **Personalized Shopping**: Display clothing items that match the user's selected filters and recommended color palette.
+- **Personalized Shopping**: Display clothing items in the Myntra website that match the user's selected filters and recommended color palette.
 
 ## Installation
 
@@ -51,18 +51,7 @@ ReStyle is an innovative application that offers personalized shopping experienc
     - The application will automatically process the uploaded image to segment the face, detect dominant colors, and generate a recommended color palette.
 
 5. **Start Shopping**:
-    - Click on the "Start shopping" button to view personalized clothing recommendations. If the required sections (gender, master category, and image upload) are not completed, a message will be displayed prompting the user to complete these sections.
-
-## File Structure
-
-- `Interface/`
-  - `model.py`: Main script for image processing, color detection, and generating personalized recommendations.
-  - `shopping.py`: Script for displaying the shopping interface with filtered clothing items.
-- `data/`
-  - `dataset/`
-    - `myntradataset/`
-      - `styles.csv`: CSV file containing product details.
-      - `images/`: Directory containing product images.
+    - Click on the "Check out the recommended products on myntra" button to view personalized clothing recommendations. If the required sections (gender, master category, and image upload) are not completed, a message will be displayed prompting the user to complete these sections.
 
 ## Dependencies
 
@@ -74,4 +63,4 @@ ReStyle is an innovative application that offers personalized shopping experienc
 - scikit-learn
 - Pandas
 
-  ## 
+  
